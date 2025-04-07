@@ -4,7 +4,7 @@ import os
 
 st.title("📚 Evaluador Académico")
 
-# Entradas del usuario
+# FORMULARIO
 nombre = st.text_input("¿Cómo te llamas?")
 edad = st.number_input("¿Cuántos años tienes?", min_value=1, max_value=100)
 carrera = st.text_input("¿Qué carrera estudias?")
@@ -15,7 +15,7 @@ if st.button("Evaluar"):
     st.write(f"Tienes {edad} años y estudias {carrera}.")
     st.write(f"Tu promedio es: {promedio}")
 
-    # Evaluación del promedio
+    # EVALUACIÓN
     if promedio >= 9:
         st.success("🎉 ¡Excelente trabajo! Vas muy bien.")
     elif promedio >= 8:
@@ -25,29 +25,30 @@ if st.button("Evaluar"):
     else:
         st.error("❌ Necesitas esforzarte más. ¡Tú puedes!")
 
-    # Aprobación
-    if promedio >= 6:
-        st.success("📘 Resultado: Aprobada ✅")
-    else:
-        st.error("📕 Resultado: Reprobada ❌")
+    # GUARDAR RESPUESTA EN CSV
+    datos = pd.DataFrame({
+        'Nombre': [nombre],
+        'Edad': [edad],
+        'Carrera': [carrera],
+        'Promedio': [promedio]
+    })
 
-    # 👇 Guardar los datos en CSV
-    archivo = "registros.csv"
-    nuevo_dato = {
-        "Nombre": nombre,
-        "Edad": edad,
-        "Carrera": carrera,
-        "Promedio": promedio
-    }
-
+    archivo = "respuestas.csv"
     if os.path.exists(archivo):
-        df = pd.read_csv(archivo)
-        df = pd.concat([df, pd.DataFrame([nuevo_dato])], ignore_index=True)
+        datos.to_csv(archivo, mode='a', header=False, index=False)
     else:
-        df = pd.DataFrame([nuevo_dato])
+        datos.to_csv(archivo, index=False)
 
-    df.to_csv(archivo, index=False)
-    st.success("📁 Los datos se han guardado correctamente.")
+    st.success("✅ ¡Tus datos se guardaron en respuestas.csv!")
+
+# 📋 MOSTRAR DATOS GUARDADOS
+st.subheader("📊 Historial de respuestas:")
+if os.path.exists("respuestas.csv"):
+    df = pd.read_csv("respuestas.csv")
+    st.dataframe(df)
+else:
+    st.info("Aún no hay respuestas registradas.")
+
 
 
   
